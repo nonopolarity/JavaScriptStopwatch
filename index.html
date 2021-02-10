@@ -83,8 +83,6 @@
                 if (startButtonMode) {
                     timeStart = Date.now();
                     timerID = setInterval(updateDisplay, 10);
-
-
                 } else {
                     updateDisplay();
                     cumulativeDuration += (Date.now() - timeStart);
