@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-    <!-- Author: @KennethKinLum at github -->
+<!-- Author: @KennethKinLum at github -->
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -86,7 +87,7 @@
                 } else {
                     updateDisplay();
                     cumulativeDuration += (Date.now() - timeStart);
-                    clearInterval(timerID);
+                    timerID && clearInterval(timerID);
                     timerID = null;
                 }
                 startStopButton.innerHTML = startButtonMode ? "Pause" : "Start";
@@ -94,10 +95,9 @@
             });
 
             resetButton.addEventListener("click", ev => {
-                if (timerID !== null) {
-                    clearInterval(timerID);
-                    timerID = null;
-                }
+                timerID && clearInterval(timerID);
+                timerID = null;
+
                 displayElement.innerHTML = '00:00:00<div class="hundredth">00 / 100</div>';
                 cumulativeDuration = 0;
                 startButtonMode = true;
