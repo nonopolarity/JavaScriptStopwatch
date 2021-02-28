@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+    <!-- Author: @KennethKinLum at github -->
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            font: 9.3vw "Arial Black", "Avenir-Black", "Arial", sans-serif;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #stopwatch {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-flow: column;
+            text-align: center;
+        }
+
+        #stopwatch .hundredth {
+            color: #999;
+        }
+
+        button {
+            font: 3vw "Arial Black", "Avenir-Black", "Arial", sans-serif;
+            padding: .33em .66em .48em;
+            border-radius: .6em;
+            width: 5.1em;
+            outline: none;
+        }
+
+        button:active {
+            background: #999;
+        }
+        </style>
+    </head>
+    <body>
+        <div id="stopwatch">
+            <div class="display">
+                00:00:00
+                <div class="hundredth">00 / 100</div>
+            </div>
+            <div>
+                <button class="start-stop-btn">Start</button>
+                <button class="reset-btn">Reset</button>
+            </div>
+        </div>
+        <script>
+        (function () {
+
+            let timeStart = null,
+                cumulativeDuration = 0,
+                startButtonMode = true,
+                stopRepeatUpdate,
+                displayElement = document.querySelector("#stopwatch .display"),
+                startStopButton = document.querySelector("#stopwatch .start-stop-btn"),
+                resetButton = document.querySelector("#stopwatch .reset-btn");
+
+            function pad(a) {
+                return (a >= 10) ? `${a}` : `0${a}`;
+            }
+
+            function updateDisplay() {
+                const timeElapsed = (Date.now() - timeStart) + cumulativeDuration;
+                const hour = Math.floor(timeElapsed / 1000 / 60 / 60),
+                    minute = Math.floor(timeElapsed / 1000 / 60) % 60,
+                    second = Math.floor(timeElapsed / 1000) % 60,
+                    centis = Math.floor((timeElapsed % 1000) / 10);
+                displayElement.innerHTML = `${pad(hour)}:${pad(minute)}:${pad(second)}<div class="hundredth">${pad(centis)} / 100</div>`;
+            }
+
+            function repeatUpdateDisplay() {
+                let continueToUpdate = true;
+
+                function updater() {
+                    
+                    if (continueToUpdate) {
+                        updateDisplay();
+                        requestAnimationFrame(updater);
+                    }
+                
+                }
+
+                requestAnimationFrame(updater);
+
+                return function () {
+                    continueToUpdate = false;
+                }
+            }
+
+            startStopButton.addEventListener("click", ev => {
+                if (startButtonMode) {
+                    timeStart = Date.now();
+                    stopRepeatUpdate = repeatUpdateDisplay();
+                } else {
+                    updateDisplay();
+                    cumulativeDuration += (Date.now() - timeStart);
+                    stopRepeatUpdate && stopRepeatUpdate();
+                    stopRepeatUpdate = null;
+                }
+                startStopButton.innerHTML = startButtonMode ? "Pause" : "Start";
+                startButtonMode = !startButtonMode;
+            });
+
+            resetButton.addEventListener("click", ev => {
+                stopRepeatUpdate && stopRepeatUpdate();
+                stopRepeatUpdate = null;
+
+                displayElement.innerHTML = '00:00:00<div class="hundredth">00 / 100</div>';
+                cumulativeDuration = 0;
+                startButtonMode = true;
+                startStopButton.innerHTML = "Start";
+            });
+
+        }());
+        </script>
+    </body>
+</html>
