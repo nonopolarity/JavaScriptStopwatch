@@ -62,8 +62,9 @@
             let timeStart = null,
                 cumulativeDuration = 0,
                 startButtonMode = true,
-                stopRepeatUpdateFn,
-                displayElement = document.querySelector("#stopwatch .display"),
+                stopRepeatUpdateFn;
+
+            const displayElement = document.querySelector("#stopwatch .display"),
                 startStopButton = document.querySelector("#stopwatch .start-stop-btn"),
                 resetButton = document.querySelector("#stopwatch .reset-btn");
 
