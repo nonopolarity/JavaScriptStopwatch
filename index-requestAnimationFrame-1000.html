@@ -49,7 +49,7 @@
         <div id="stopwatch">
             <div class="display">
                 00:00:00
-                <div class="hundredth">00 / 100</div>
+                <div class="hundredth">000 / 1000</div>
             </div>
             <div>
                 <button class="start-stop-btn">Start</button>
@@ -62,7 +62,7 @@
             let timeStart = null,
                 cumulativeDuration = 0,
                 startButtonMode = true,
-                stopRepeatUpdateFn,
+                stopRepeatUpdate,
                 displayElement = document.querySelector("#stopwatch .display"),
                 startStopButton = document.querySelector("#stopwatch .start-stop-btn"),
                 resetButton = document.querySelector("#stopwatch .reset-btn");
@@ -71,22 +71,27 @@
                 return (a >= 10) ? `${a}` : `0${a}`;
             }
 
+            function pad1000(a) {
+                const n = (a >= 1000) ? 0 : 3 - `${a}`.length;
+                return `${"0".repeat(n)}${a}`;
+            }
+
             function updateDisplay() {
                 const timeElapsed = (Date.now() - timeStart) + cumulativeDuration;
                 const hour = Math.floor(timeElapsed / 1000 / 60 / 60),
                     minute = Math.floor(timeElapsed / 1000 / 60) % 60,
                     second = Math.floor(timeElapsed / 1000) % 60,
-                    centis = Math.floor((timeElapsed % 1000) / 10);
-                displayElement.innerHTML = `${pad(hour)}:${pad(minute)}:${pad(second)}<div class="hundredth">${pad(centis)} / 100</div>`;
+                    ms = timeElapsed % 1000;
+                displayElement.innerHTML = `${pad(hour)}:${pad(minute)}:${pad(second)}<div class="hundredth">${pad1000(ms)} / 1000</div>`;
             }
 
-            function repeatUpdateDisplay(fn) {
+            function repeatUpdateDisplay() {
                 let continueToUpdate = true;
 
                 function updater() {
                     
                     if (continueToUpdate) {
-                        fn();
+                        updateDisplay();
                         requestAnimationFrame(updater);
                     }
                 
@@ -102,22 +107,22 @@
             startStopButton.addEventListener("click", ev => {
                 if (startButtonMode) {
                     timeStart = Date.now();
-                    stopRepeatUpdateFn = repeatUpdateDisplay(updateDisplay);
+                    stopRepeatUpdate = repeatUpdateDisplay();
                 } else {
                     updateDisplay();
                     cumulativeDuration += (Date.now() - timeStart);
-                    stopRepeatUpdateFn && stopRepeatUpdateFn();
-                    stopRepeatUpdateFn = null;
+                    stopRepeatUpdate && stopRepeatUpdate();
+                    stopRepeatUpdate = null;
                 }
                 startStopButton.innerHTML = startButtonMode ? "Pause" : "Start";
                 startButtonMode = !startButtonMode;
             });
 
             resetButton.addEventListener("click", ev => {
-                stopRepeatUpdateFn && stopRepeatUpdateFn();
-                stopRepeatUpdateFn = null;
+                stopRepeatUpdate && stopRepeatUpdate();
+                stopRepeatUpdate = null;
 
-                displayElement.innerHTML = '00:00:00<div class="hundredth">00 / 100</div>';
+                displayElement.innerHTML = '00:00:00<div class="hundredth">000 / 1000</div>';
                 cumulativeDuration = 0;
                 startButtonMode = true;
                 startStopButton.innerHTML = "Start";
