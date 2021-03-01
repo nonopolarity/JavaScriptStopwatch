@@ -84,12 +84,10 @@
                 let continueToUpdate = true;
 
                 function updater() {
-                    
                     if (continueToUpdate) {
                         fn();
                         requestAnimationFrame(updater);
                     }
-                
                 }
 
                 requestAnimationFrame(updater);
