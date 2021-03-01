@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-    <!-- Author: @KennethKinLum at github -->
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
-        <style>
+<!-- Author: @KennethKinLum at github -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
         html,
         body {
             height: 100%;
@@ -43,28 +44,26 @@
         button:active {
             background: #999;
         }
-        </style>
-    </head>
-    <body>
-        <div id="stopwatch">
-            <div class="display">
-                00:00:00
-                <div class="hundredth">00 / 100</div>
-            </div>
-            <div>
-                <button class="start-stop-btn">Start</button>
-                <button class="reset-btn">Reset</button>
-            </div>
+    </style>
+</head>
+
+<body>
+    <div id="stopwatch">
+        <div class="display">00:00:00<div class="hundredth">00 / 100</div>
         </div>
-        <script>
+        <div>
+            <button class="start-stop-btn">Start</button>
+            <button class="reset-btn">Reset</button>
+        </div>
+    </div>
+    <script>
         (function () {
 
             let timeStart = null,
                 cumulativeDuration = 0,
                 startButtonMode = true,
-                stopRepeatUpdateFn;
-
-            const displayElement = document.querySelector("#stopwatch .display"),
+                timerID,
+                displayElement = document.querySelector("#stopwatch .display"),
                 startStopButton = document.querySelector("#stopwatch .start-stop-btn"),
                 resetButton = document.querySelector("#stopwatch .reset-btn");
 
@@ -81,40 +80,23 @@
                 displayElement.innerHTML = `${pad(hour)}:${pad(minute)}:${pad(second)}<div class="hundredth">${pad(centis)} / 100</div>`;
             }
 
-            function repeatUpdateDisplay(fn) {
-                let continueToUpdate = true;
-
-                function updater() {
-                    if (continueToUpdate) {
-                        fn();
-                        requestAnimationFrame(updater);
-                    }
-                }
-
-                requestAnimationFrame(updater);
-
-                return function () {
-                    continueToUpdate = false;
-                }
-            }
-
             startStopButton.addEventListener("click", ev => {
                 if (startButtonMode) {
                     timeStart = Date.now();
-                    stopRepeatUpdateFn = repeatUpdateDisplay(updateDisplay);
+                    timerID = setInterval(updateDisplay, 10);
                 } else {
                     updateDisplay();
                     cumulativeDuration += (Date.now() - timeStart);
-                    stopRepeatUpdateFn && stopRepeatUpdateFn();
-                    stopRepeatUpdateFn = null;
+                    timerID && clearInterval(timerID);
+                    timerID = null;
                 }
                 startStopButton.innerHTML = startButtonMode ? "Pause" : "Start";
                 startButtonMode = !startButtonMode;
             });
 
             resetButton.addEventListener("click", ev => {
-                stopRepeatUpdateFn && stopRepeatUpdateFn();
-                stopRepeatUpdateFn = null;
+                timerID && clearInterval(timerID);
+                timerID = null;
 
                 displayElement.innerHTML = '00:00:00<div class="hundredth">00 / 100</div>';
                 cumulativeDuration = 0;
@@ -123,6 +105,7 @@
             });
 
         }());
-        </script>
-    </body>
+    </script>
+</body>
+
 </html>
